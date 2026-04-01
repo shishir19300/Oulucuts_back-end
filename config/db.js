@@ -9,10 +9,11 @@ port: process.env.DB_PORT,
 database: process.env.DB_NAME,
 });
 
-pool.connect((err, client, release) => {
+pool.connect((err, client, done) => {
     if(err) {
         return console.error('Error acquiring client', err.stack);
     }
     console.log('successfully connected to the database');
-    release();
+    done();
 });
+module.exports = pool;
