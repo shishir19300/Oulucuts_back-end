@@ -39,4 +39,48 @@ catch (error) {
     return res.status(500).json({ error: 'Server error. Please try again.' });
 }
 });
+/* Login */
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+   if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
+  }
+   try {
+    const result = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
+     if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid username or password.' });
+    }
+     const user = result.rows[0];
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Invalid username or password.' });
+    }
+     req.session.user = {
+      id:       user.id,
+      name:     user.name,
+      username: user.username,
+    };
+    console.log('✅ User logged in:', user.username);
+
+    return res.status(200).json({
+      message: 'Login successful!',
+      user: {
+        id:       user.id,
+        name:     user.name,
+        username: user.username,
+      }
+    });
+    } catch (err) {
+    console.error('Login error:', err.message);
+    return res.status(500).json({ error: 'Server error. Please try again.' });
+  }
+});
+
+
 module.exports = router;
