@@ -8,7 +8,7 @@ const session = require('express-session');
 const path    = require('path');
 require('dotenv').config();
 
-// const bookingRoutes = require('./routes/bookings');
+ const bookingRoutes = require('./routes/bookings');
 
 const app = express();
 
@@ -32,7 +32,7 @@ app.use(session({
 }));
 app.use('/api/barbers', barberRoutes);
 app.use('/api/auth', authRoutes);
-// app.use('/api/bookings', bookingRoutes);
+app.use('/api/bookings', bookingRoutes);
 const PORT = process.env.PORT || 3000;
 
 
