@@ -2,6 +2,7 @@
 const authRoutes = require('./routes/auth');
 
 const barberRoutes = require('./routes/barbers');
+const commentsRoutes = require('./routes/comments');
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
@@ -31,6 +32,7 @@ app.use(session({
   }
 }));
 app.use('/api/barbers', barberRoutes);
+app.use('/api/comments', commentsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 const PORT = process.env.PORT || 3000;
