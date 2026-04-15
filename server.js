@@ -1,4 +1,4 @@
-
+const adminAuthRoutes = require('./routes/adminAuth');
 const authRoutes = require('./routes/auth');
 
 const barberRoutes = require('./routes/barbers');
@@ -31,6 +31,7 @@ app.use(session({
     secure:   process.env.NODE_ENV === 'production'
   }
 }));
+app.use('/api/admin', adminAuthRoutes);
 app.use('/api/barbers', barberRoutes);
 app.use('/api/comments', commentsRoutes);
 app.use('/api/auth', authRoutes);

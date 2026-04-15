@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db'); 
+const adminVerify = require('../middleware/adminVerify');
 
 
 router.get('/', async (req, res) => {
@@ -23,5 +24,64 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+router.post('/', adminVerify, async (req, res) => {
+  
+  const { 
+    name, 
+    age, 
+    phone_no, 
+    experience, 
+    specialty, 
+    special_message, 
+    photo_url 
+  } = req.body;
+  
+  if (!name || !specialty || !phone_no) {
+  return res.status(400).json({ error: 'Name, specialty, and phone number are required.' });
+}
+try {
+  const { rows } = await pool.query(
+    `INSERT INTO barbers (name, age, phone_no, experience, specialty, special_message, photo_url) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7) 
+     RETURNING *`,
+    [
+      name, 
+      age, 
+      phone_no, 
+      experience, 
+      specialty, 
+      special_message || null, 
+      photo_url || null
+    ]
+  );
+      res.status(201).json({
+      message: 'Barber added successfully.',
+      barber: rows[0]
+    });
+     } catch (err) {
+    console.error('Add barber error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
 
+router.delete('/:id', adminVerify, async (req, res) => {
+  const { id } = req.params;
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'Invalid barber ID.' });
+  }
+  try {
+    const { rowCount } = await pool.query(
+      'DELETE FROM barbers WHERE id = $1',
+      [id]
+    );
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Barber not found.' });
+    }
+      res.json({ message: `Barber ${id} deleted successfully.` });
+       } catch (err) {
+    console.error('Delete barber error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+});
 module.exports = router;
