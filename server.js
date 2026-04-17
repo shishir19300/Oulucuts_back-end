@@ -1,22 +1,30 @@
-const adminAuthRoutes = require('./routes/adminAuth');
-const authRoutes = require('./routes/auth');
 
-const barberRoutes = require('./routes/barbers');
-const commentsRoutes = require('./routes/comments');
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const path    = require('path');
 require('dotenv').config();
 
- const bookingRoutes = require('./routes/bookings');
+const adminAuthRoutes = require('./routes/adminAuth');
+const authRoutes = require('./routes/auth');
+const barberRoutes = require('./routes/barbers');
+const commentsRoutes = require('./routes/comments');
+const bookingRoutes = require('./routes/bookings');
 
 const app = express();
 
+app.set('trust proxy', 1);
+
+const allowedOrigins = [
+  'http://127.0.0.1:5500',
+  'https://your-app.onrender.com'
+];
+
 app.use(cors({
-  origin: 'http://127.0.0.1:5500',
+  origin: allowedOrigins,
   credentials: true
 })); 
+
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,6 +46,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 const PORT = process.env.PORT || 3000;
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../front-end/public', 'index.html'));
+});
 
 
 app.listen(PORT, () => {
