@@ -46,7 +46,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 const PORT = process.env.PORT || 3000;
 
-app.get('/*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../front-end/public', 'index.html'));
 });
 
