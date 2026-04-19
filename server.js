@@ -17,7 +17,7 @@ app.set('trust proxy', 1);
 
 const allowedOrigins = [
   'http://127.0.0.1:5500',
-  'https://oulucuts-back-end.onrender.com'
+  'https://web-development-project-oulucuts-1.onrender.com',
 ];
 
 app.use(cors({
