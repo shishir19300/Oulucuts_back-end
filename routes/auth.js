@@ -66,7 +66,6 @@ router.post('/login', async (req, res) => {
       name:     user.name,
       username: user.username,
     };
-    console.log('✅ User logged in:', user.username);
 
     return res.status(200).json({
       message: 'Login successful!',
@@ -82,5 +81,17 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/check', (req, res) => {
+  if (req.session.user) {
+    return res.status(200).json({
+      loggedIn: true,
+      user: req.session.user
+    });
+  } else {
+    return res.status(200).json({
+      loggedIn: false
+    });
+  }
+});
 
 module.exports = router;

@@ -24,6 +24,7 @@ app.set('trust proxy', 1);
 
 const allowedOrigins = [
   'http://127.0.0.1:5500',
+  'http://localhost:5500',
   'https://web-development-project-oulucuts-1.onrender.com',
 ];
 
@@ -40,12 +41,15 @@ app.use(express.static(path.join(__dirname, '../front-end/public')));
 app.use(session({
   secret:            process.env.SESSION_SECRET,
   resave:            false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: {
-    sameSite: 'lax',
-    secure:   process.env.NODE_ENV === 'production'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure:   process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours
   }
 }));
+
 app.use('/api/admin', adminAuthRoutes);
 app.use('/api/barbers', barberRoutes);
 app.use('/api/comments', commentsRoutes);
