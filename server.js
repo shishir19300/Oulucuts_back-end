@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const path    = require('path');
+const multer  = require('multer'); 
+const fs      = require('fs');
 require('dotenv').config();
 
 const adminAuthRoutes = require('./routes/adminAuth');
@@ -12,6 +14,11 @@ const commentsRoutes = require('./routes/comments');
 const bookingRoutes = require('./routes/bookings');
 
 const app = express();
+
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
 
 app.set('trust proxy', 1);
 
@@ -45,6 +52,10 @@ app.use('/api/comments', commentsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/bookings', bookingRoutes);
 const PORT = process.env.PORT || 3000;
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use(express.static(path.join(__dirname, '../front-end/public')));
 
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../front-end/public', 'index.html'));

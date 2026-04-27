@@ -2,8 +2,20 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db'); 
 const adminVerify = require('../middleware/adminVerify');
+const multer = require('multer'); 
+const path = require('path');
 
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); 
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM barbers ORDER BY id ASC');
@@ -24,7 +36,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
-router.post('/', adminVerify, async (req, res) => {
+router.post('/', adminVerify, upload.single('photo'), async (req, res) => {
   
   const { 
     name, 
@@ -33,9 +45,8 @@ router.post('/', adminVerify, async (req, res) => {
     experience, 
     specialty, 
     special_message, 
-    photo_url 
   } = req.body;
-  
+  const photo_path = req.file ? `/uploads/${req.file.filename}` : null;
   if (!name || !specialty || !phone_no) {
   return res.status(400).json({ error: 'Name, specialty, and phone number are required.' });
 }
@@ -51,7 +62,7 @@ try {
       experience, 
       specialty, 
       special_message || null, 
-      photo_url || null
+      photo_path || null
     ]
   );
       res.status(201).json({
